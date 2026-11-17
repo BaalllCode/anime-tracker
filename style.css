@@ -1,10 +1,9 @@
 /* CSS Variables for easy color management */
 :root {
-    --bg-color: #f8f9fa;
     --text-color: #333333;
     --secondary-color: #666666;
     --accent-color: #000000;
-    --border-color: #dddddd;
+    --border-color: rgba(0, 0, 0, 0.1);
 }
 
 /* Basic Reset */
@@ -14,12 +13,26 @@
 }
 
 body {
-    background-color: var(--bg-color);
+    /* 1. O gradiente de 4 cores calmas e relaxantes */
+    background: linear-gradient(-45deg, #a18cd1, #fbc2eb, #84fab0, #8fd3f4);
+    /* 2. Esticar o fundo para ser 4x maior que o ecrã */
+    background-size: 400% 400%;
+    /* 3. Ligar a animação: nome, duração (15s = muito lento e calmo), transição suave e loop infinito */
+    animation: gradientLoop 15s ease infinite;
+    
     color: var(--text-color);
     margin: 0;
     padding: 20px;
     display: flex;
     justify-content: center;
+    min-height: 100vh; /* Garante que o fundo cobre sempre o ecrã todo */
+}
+
+/* --- ANIMATION KEYFRAMES (O motor do fundo) --- */
+@keyframes gradientLoop {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
 }
 
 .container {
@@ -32,6 +45,8 @@ body {
 header {
     text-align: center;
     margin-bottom: 40px;
+    color: white; /* Alterado para ler melhor por cima do fundo colorido */
+    text-shadow: 0 2px 4px rgba(0,0,0,0.2); /* Sombra subtil para leitura */
 }
 
 h1 {
@@ -42,6 +57,8 @@ h1 {
 .section-title {
     font-size: 24px;
     margin-bottom: 20px;
+    color: white;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.2);
 }
 
 /* --- SEARCH SECTION (FLEXBOX) --- */
@@ -57,6 +74,8 @@ input {
     font-size: 16px;
     border: 1px solid var(--border-color);
     border-radius: 5px;
+    /* Transparência suave na barra de pesquisa */
+    background-color: rgba(255, 255, 255, 0.9);
 }
 
 button {
@@ -82,7 +101,8 @@ button:hover {
 
 /* --- CARD STYLES --- */
 .card {
-    background-color: white;
+    /* Ligeira transparência (0.9) para vermos um pouco do fundo animado através do cartão */
+    background-color: rgba(255, 255, 255, 0.9);
     border: 1px solid var(--border-color);
     border-radius: 8px;
     padding: 15px;
@@ -115,7 +135,7 @@ button:hover {
     color: var(--accent-color);
 }
 
-/* Simple animation keyframes */
+/* Simple animation keyframes for Cards */
 @keyframes fadeUp {
     from {
         opacity: 0;
