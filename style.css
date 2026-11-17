@@ -14,8 +14,7 @@
 
 body {
     /* 1. O gradiente de 4 cores calmas e relaxantes */
-    background: linear-gradient(-45deg, #a18cd1, #fbc2eb, #84fab0, #8fd3f4);
-    /* 2. Esticar o fundo para ser 4x maior que o ecrã */
+    background: linear-gradient(-45deg, #ffb8d2, #ffd2a6, #a6ffd2, #a6d2ff, #c2a6ff, #ffb8ea);
     background-size: 400% 400%;
     /* 3. Ligar a animação: nome, duração (15s = muito lento e calmo), transição suave e loop infinito */
     animation: gradientLoop 15s ease infinite;
@@ -25,7 +24,7 @@ body {
     padding: 20px;
     display: flex;
     justify-content: center;
-    min-height: 100vh; /* Garante que o fundo cobre sempre o ecrã todo */
+    min-height: 100dvh; /* Garante que o fundo cobre sempre o ecrã todo */
 }
 
 /* --- ANIMATION KEYFRAMES (O motor do fundo) --- */
