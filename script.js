@@ -7,8 +7,8 @@ document.addEventListener('DOMContentLoaded', function() {
     let resultsContainer = document.getElementById('resultsContainer');
     let sectionTitle = document.getElementById('sectionTitle');
 
-    // 12 IDs of popular TV Shows (Game of Thrones, Breaking Bad, Stranger Things, etc.)
-    let recommendedIds = [82, 169, 2993, 526, 431, 15299, 269, 430, 335, 527, 179, 30600];
+    // CORREÇÃO 1: Substituímos o último ID (que estava partido) pelo 66 (The Big Bang Theory)
+    let recommendedIds = [82, 169, 2993, 526, 431, 15299, 269, 430, 335, 527, 179, 66];
 
     // 2. Load recommendations when page opens
     loadRecommendations();
@@ -46,44 +46,48 @@ document.addEventListener('DOMContentLoaded', function() {
         // Read data and create cards using a simple FOR loop
         for (let i = 0; i < responses.length; i++) {
             let response = responses[i];
-            let data = await response.json();
 
-            // Find episode count
-            let episodeCount = 0;
-            if (data._embedded && data._embedded.episodes) {
-                episodeCount = data._embedded.episodes.length;
+            // CORREÇÃO 2: Só desenhamos o cartão se a resposta da API for um sucesso (evita erros 404 Not Found)
+            if (response.ok === true) {
+                let data = await response.json();
+
+                // Find episode count
+                let episodeCount = 0;
+                if (data._embedded && data._embedded.episodes) {
+                    episodeCount = data._embedded.episodes.length;
+                }
+
+                // Find duration
+                let duration = data.averageRuntime;
+                if (duration === null) {
+                    duration = 45; // Default for normal TV shows
+                }
+
+                // Math for total hours
+                let totalMinutes = episodeCount * duration;
+                let totalHours = (totalMinutes / 60).toFixed(1);
+
+                // Find image
+                let imageUrl = "https://via.placeholder.com/250x350?text=No+Image";
+                if (data.image && data.image.original) {
+                    imageUrl = data.image.original;
+                }
+
+                // Create HTML card
+                let card = document.createElement('div');
+                card.className = 'card';
+                card.style.animationDelay = (i * 0.05) + "s"; // Stagger animation
+
+                card.innerHTML = `
+                    <img src="${imageUrl}" alt="Poster">
+                    <h2>${data.name}</h2>
+                    <p>Episodes: <span class="highlight">${episodeCount}</span></p>
+                    <p>Time: <span class="highlight">${totalHours}h</span></p>
+                    <p>Status: <span>${data.status}</span></p>
+                `;
+
+                resultsContainer.appendChild(card);
             }
-
-            // Find duration
-            let duration = data.averageRuntime;
-            if (duration === null) {
-                duration = 45; // Default for normal TV shows
-            }
-
-            // Math for total hours
-            let totalMinutes = episodeCount * duration;
-            let totalHours = (totalMinutes / 60).toFixed(1);
-
-            // Find image
-            let imageUrl = "https://via.placeholder.com/250x350?text=No+Image";
-            if (data.image && data.image.original) {
-                imageUrl = data.image.original;
-            }
-
-            // Create HTML card
-            let card = document.createElement('div');
-            card.className = 'card';
-            card.style.animationDelay = (i * 0.05) + "s"; // Stagger animation
-
-            card.innerHTML = `
-                <img src="${imageUrl}" alt="Poster">
-                <h2>${data.name}</h2>
-                <p>Episodes: <span class="highlight">${episodeCount}</span></p>
-                <p>Time: <span class="highlight">${totalHours}h</span></p>
-                <p>Status: <span>${data.status}</span></p>
-            `;
-
-            resultsContainer.appendChild(card);
         }
     }
 
@@ -126,7 +130,8 @@ document.addEventListener('DOMContentLoaded', function() {
             let episodeCount = 0;
             let episodeResponse = await fetch('https://api.tvmaze.com/shows/' + item.id + '/episodes');
             
-            if (episodeResponse.ok) {
+            // Aqui também usamos o .ok para garantir que os episódios carregaram bem
+            if (episodeResponse.ok === true) {
                 let episodes = await episodeResponse.json();
                 episodeCount = episodes.length;
             }
