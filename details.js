@@ -8,17 +8,17 @@ document.addEventListener('DOMContentLoaded', function() {
     let detailsContainer = document.getElementById('showDetails');
     let recommendedContainer = document.getElementById('recommendedContainer');
 
-    // Voltar para casa se não houver ID
+    // Voltar para a página principal se não houver ID
     if (showId === null) {
         window.location.href = 'index.html';
         return;
     }
 
-    // 2. Iniciar as funções de carregamento
+    // Iniciar funções de carregamento
     loadShowDetails(showId);
     loadSimilarShows();
 
-    // --- FUNÇÃO 1: CARREGAR A PÁGINA PRINCIPAL DA SÉRIE ---
+    // ---------------------------------------- FUNÇÃO 1: CARREGAR A PÁGINA PRINCIPAL DA SÉRIE ----------------------------------------
     async function loadShowDetails(id) {
         let response = await fetch('https://api.tvmaze.com/shows/' + id);
         
@@ -41,25 +41,27 @@ document.addEventListener('DOMContentLoaded', function() {
             summaryText = "<p>No description available.</p>";
         }
 
-        // Gerar as "tags" (pílulas) para os géneros (Drama, Sci-Fi, etc) usando um FOR simples
+        // Gerar as tags para os géneros (Drama, Sci-Fi, etc)
         let genresHtml = '';
         for (let i = 0; i < data.genres.length; i++) {
             genresHtml += '<span class="genre-tag">' + data.genres[i] + '</span>';
         }
 
-        // Nota (ex: 8.7/10)
+        // Nota (ex: 9.2/10)
         let rating = 'N/A';
         if (data.rating && data.rating.average) {
             rating = data.rating.average + '<span style="font-size:16px; color:#666;"> / 10</span>';
         }
 
         // Botão para o site oficial (apenas se existir)
+        // Nota: tentei ir buscar as séries todas à netflix mas, devido ao enorme nº de séries que existem na API, decidi pedir ajuda da AI de forma a conseguir 
+        // redirecionar todas ou quase todas as séries para um site "oficial". (alguns deles parecem meio manhosos mas penso que não há problema para este assignment)
         let siteButtonHtml = '';
         if (data.officialSite) {
             siteButtonHtml = '<a href="' + data.officialSite + '" target="_blank" class="action-btn">Visit Official Site</a>';
         }
 
-        // Desenhar a interface cinemática
+        // Desenhar a UI
         detailsContainer.innerHTML = `
             <img src="${imageUrl}" alt="Poster" class="details-image">
             
@@ -81,10 +83,10 @@ document.addEventListener('DOMContentLoaded', function() {
         `;
     }
 
-    // --- FUNÇÃO 2: CARREGAR AS SÉRIES RECOMENDADAS NO FUNDO ---
+    // ---------------------------------------- FUNÇÃO 2: CARREGAR AS SÉRIES RECOMENDADAS ----------------------------------------
     async function loadSimilarShows() {
-        // Escolhemos 4 séries aleatórias/populares para sugerir
-        let similarIds = [73, 169, 431, 82]; // Ex: The Walking Dead, Breaking Bad, Gotham, Game of Thrones
+        // 4 séries aleatórias para sugerir
+        let similarIds = [73, 169, 431, 82];
         
         let requestList = [];
         for (let i = 0; i < similarIds.length; i++) {
@@ -115,9 +117,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     imageUrl = data.image.original;
                 }
 
-                // Desenhar os cartões normais da página inicial
+                // Desenhar os cartões da página inicial
                 let card = document.createElement('a');
-                card.href = 'details.html?id=' + data.id; // Quando clicamos num recomendado, recarrega a página de detalhes!
+                card.href = 'details.html?id=' + data.id;
                 card.className = 'card';
                 card.style.animationDelay = (i * 0.05) + "s"; 
 

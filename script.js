@@ -1,7 +1,7 @@
-// Wait for HTML to load
+// Aguarda que o HTML carregue
 document.addEventListener('DOMContentLoaded', function() {
     
-    // 1. Store HTML elements in simple variables
+    // Variáveis
     let searchBtn = document.getElementById('searchBtn');
     let searchInput = document.getElementById('searchInput');
     let resultsContainer = document.getElementById('resultsContainer');
@@ -9,27 +9,23 @@ document.addEventListener('DOMContentLoaded', function() {
 
     let recommendedIds = [82, 169, 2993, 526, 431, 15299, 269, 430, 335, 527, 179, 66];
 
-    // 2. Load recommendations when page opens
     loadRecommendations();
 
-    // 3. Search button click event
     searchBtn.addEventListener('click', function() {
         searchShow();
     });
 
-    // 4. Enter key event on the input box
     searchInput.addEventListener('keypress', function(event) {
         if (event.key === 'Enter') {
             searchShow();
         }
     });
 
-    // --- FUNCTION A: LOAD INITIAL RECOMMENDATIONS ---------------------------------
+    // ---------------------------------------- FUNÇÃO A: CARREGAR AS RECOMENDAÇÕES INICIAIS ----------------------------------------
     async function loadRecommendations() {
         sectionTitle.textContent = "Recommended for you";
         resultsContainer.innerHTML = "<p>Loading 12 recommendations...</p>";
 
-        // Create an array of fetch requests
         let requestList = [];
         for (let i = 0; i < recommendedIds.length; i++) {
             let id = recommendedIds[i];
@@ -37,12 +33,11 @@ document.addEventListener('DOMContentLoaded', function() {
             requestList.push(request);
         }
 
-        // Wait for all requests to finish at the same time
         let responses = await Promise.all(requestList);
         
-        resultsContainer.innerHTML = ""; // Clear loading message
+        resultsContainer.innerHTML = "";
 
-        // Read data and create cards using a simple FOR loop
+        // Lê dados e cria os cartões
         for (let i = 0; i < responses.length; i++) {
             let response = responses[i];
 
@@ -67,7 +62,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     imageUrl = data.image.original;
                 }
 
-                // CORREÇÃO: Usar data.id em vez de item.id
                 let card = document.createElement('a');
                 card.href = 'details.html?id=' + data.id; 
                 card.className = 'card';
@@ -87,7 +81,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
 
-    // --- FUNCTION B: SEARCH FOR A SPECIFIC TV SHOW --------------------------------------
+    // ---------------------------------------- FUNÇÃO B: PROCURAR POR UMA SÉRIE ESPECÍFICA ----------------------------------------
     async function searchShow() {
         let searchTerm = searchInput.value;
 
@@ -137,7 +131,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 imageUrl = item.image.original;
             }
 
-            // AQUI MANTÉM-SE O item.id porque a variável chama-se item nesta função
             let card = document.createElement('a');
             card.href = 'details.html?id=' + item.id;
             card.className = 'card';
