@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // --- FUNCTION A: LOAD INITIAL RECOMMENDATIONS ---
+    // --- FUNCTION A: LOAD INITIAL RECOMMENDATIONS ---------------------------------
     async function loadRecommendations() {
         sectionTitle.textContent = "Recommended for you";
         resultsContainer.innerHTML = "<p>Loading 12 recommendations...</p>";
@@ -74,7 +74,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
 
                 // Create HTML card
-                let card = document.createElement('div');
+                let card = document.createElement('a');
+                card.href = 'details.html?id=' + item.id;
                 card.className = 'card';
                 card.style.animationDelay = (i * 0.05) + "s"; // Stagger animation
 
@@ -92,7 +93,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
 
-    // --- FUNCTION B: SEARCH FOR A SPECIFIC TV SHOW ---
+    // --- FUNCTION B: SEARCH FOR A SPECIFIC TV SHOW --------------------------------------
     async function searchShow() {
         let searchTerm = searchInput.value;
 
@@ -150,7 +151,8 @@ document.addEventListener('DOMContentLoaded', function() {
             }
 
             // Create HTML card
-            let card = document.createElement('div');
+            let card = document.createElement('a');
+            card.href = 'details.html?id=' + item.id;
             card.className = 'card';
             card.style.animationDelay = (i * 0.05) + "s";
 
@@ -165,5 +167,4 @@ document.addEventListener('DOMContentLoaded', function() {
             resultsContainer.appendChild(card);
         }
     }
-
 });
