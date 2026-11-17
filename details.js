@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // ---------------------------------------- FUNÇÃO 1: CARREGAR A PÁGINA PRINCIPAL DA SÉRIE ----------------------------------------
     async function loadShowDetails(id) {
-        let response = await fetch('https://api.tvmaze.com/shows/' + id);
+        let response = await fetch('https://api.tvmaze.com/shows/' + id + '?embed=episodes');
         
         if (response.ok === false) {
             detailsContainer.innerHTML = "<p>Error loading show details.</p>";
@@ -28,6 +28,18 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         let data = await response.json();
+
+        let episodeCount = 0;
+        if (data._embedded && data._embedded.episodes) {
+            episodeCount = data._embedded.episodes.length;
+        }
+
+        let duration = data.averageRuntime;
+        if (duration === null) {
+            duration = 45;
+        }
+
+        let totalHours = ((episodeCount * duration) / 60).toFixed(1);
 
         // Imagem
         let imageUrl = "https://via.placeholder.com/320x470?text=No+Image";
@@ -73,6 +85,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="summary-text">${summaryText}</div>
                 
                 <div style="margin-bottom: 20px;">
+                    <p><strong>Episodes:</strong> <span class="highlight">${episodeCount}</span></p>
+                    <p><strong>Total Time:</strong> <span class="highlight">${totalHours}h</span></p>
                     <p><strong>Premiered:</strong> ${data.premiered || 'Unknown'}</p>
                     <p><strong>Status:</strong> ${data.status}</p>
                     <p><strong>Language:</strong> ${data.language}</p>
