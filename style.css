@@ -44,8 +44,13 @@ body {
 header {
     text-align: center;
     margin-bottom: 40px;
-    color: white; /* Alterado para ler melhor por cima do fundo colorido */
-    text-shadow: 0 2px 4px rgba(0,0,0,0.2); /* Sombra subtil para leitura */
+    color: white;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.logo-link {
+    text-decoration: none;
+    color: white;
 }
 
 h1 {
@@ -100,6 +105,7 @@ button:hover {
 
 /* --- CARD STYLES --- */
 .card {
+    position: relative;
     /* Ligeira transparência (0.9) para vermos um pouco do fundo animado através do cartão */
     background-color: rgba(255, 255, 255, 0.9);
     border: 1px solid var(--border-color);
@@ -112,8 +118,10 @@ button:hover {
 }
 
 .card:hover {
-    transform: scale(1.5);
+    transform: scale(1.05);
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+    /* para o card flutuar sobre outros cards */
+    z-index: 10;
 }
 
 .card img {
@@ -144,10 +152,10 @@ button:hover {
 @keyframes fadeUp {
     from {
         opacity: 0;
-        transform: translateY(20px);
+        top: 20px;
     }
     to {
         opacity: 1;
-        transform: translateY(0);
+        top: 0;
     }
 }
