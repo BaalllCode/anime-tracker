@@ -159,3 +159,120 @@ button:hover {
         top: 0;
     }
 }
+
+/* ---------------------- */
+
+/* --- ESTILOS DA PÁGINA DE DETALHES (Estética Cinemática) --- */
+
+.back-button {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: var(--accent-color);
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    font-weight: bold;
+    transition: background-color 0.2s ease;
+}
+
+.back-button:hover {
+    background-color: #444;
+}
+
+.details-box {
+    background-color: rgba(255, 255, 255, 0.85); /* Fundo ligeiramente translúcido */
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 40px;
+    display: flex;
+    gap: 40px;
+    margin-bottom: 50px;
+    animation: fadeUp 0.5s ease-out forwards;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+}
+
+.details-image {
+    width: 320px;
+    height: 470px;
+    border-radius: 12px;
+    object-fit: cover;
+    box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+}
+
+.details-info {
+    flex: 1;
+}
+
+.details-title {
+    font-size: 48px;
+    margin-top: 0;
+    margin-bottom: 10px;
+    letter-spacing: -1px;
+}
+
+/* Os botões redondos de género como na tua "referencia1.png" */
+.genre-tags {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+.genre-tag {
+    background-color: rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 14px;
+    color: var(--secondary-color);
+}
+
+.rating-box {
+    font-size: 24px;
+    font-weight: bold;
+    color: var(--accent-color);
+    margin-bottom: 25px;
+}
+
+.summary-text {
+    font-size: 16px;
+    line-height: 1.6;
+    color: #444;
+    margin-bottom: 30px;
+}
+
+/* Botão principal estilo "Watch movie" */
+.action-btn {
+    display: inline-block;
+    padding: 15px 35px;
+    background-color: var(--accent-color);
+    color: white;
+    text-decoration: none;
+    border-radius: 30px;
+    font-weight: bold;
+    font-size: 16px;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.action-btn:hover {
+    transform: scale(1.05);
+    opacity: 0.9;
+}
+
+/* Responsividade Básica */
+@media (max-width: 768px) {
+    .details-box {
+        flex-direction: column; 
+        align-items: center;
+        text-align: center;
+        padding: 20px;
+    }
+    .details-image {
+        width: 100%;
+        max-width: 320px;
+    }
+    .genre-tags {
+        justify-content: center;
+    }
+}
