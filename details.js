@@ -1,7 +1,7 @@
-// Wait for HTML to load
+// Espera que o HTML carregue
 document.addEventListener('DOMContentLoaded', function() {
     
-    // 1. Apanhar o ID no link
+    // Variáveis
     let urlParams = new URLSearchParams(window.location.search);
     let showId = urlParams.get('id');
 
