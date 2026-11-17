@@ -7,7 +7,6 @@ document.addEventListener('DOMContentLoaded', function() {
     let resultsContainer = document.getElementById('resultsContainer');
     let sectionTitle = document.getElementById('sectionTitle');
 
-    // CORREÇÃO 1: Substituímos o último ID (que estava partido) pelo 66 (The Big Bang Theory)
     let recommendedIds = [82, 169, 2993, 526, 431, 15299, 269, 430, 335, 527, 179, 66];
 
     // 2. Load recommendations when page opens
@@ -47,37 +46,32 @@ document.addEventListener('DOMContentLoaded', function() {
         for (let i = 0; i < responses.length; i++) {
             let response = responses[i];
 
-            // CORREÇÃO 2: Só desenhamos o cartão se a resposta da API for um sucesso (evita erros 404 Not Found)
             if (response.ok === true) {
                 let data = await response.json();
 
-                // Find episode count
                 let episodeCount = 0;
                 if (data._embedded && data._embedded.episodes) {
                     episodeCount = data._embedded.episodes.length;
                 }
 
-                // Find duration
                 let duration = data.averageRuntime;
                 if (duration === null) {
-                    duration = 45; // Default for normal TV shows
+                    duration = 45; 
                 }
 
-                // Math for total hours
                 let totalMinutes = episodeCount * duration;
                 let totalHours = (totalMinutes / 60).toFixed(1);
 
-                // Find image
                 let imageUrl = "https://via.placeholder.com/250x350?text=No+Image";
                 if (data.image && data.image.original) {
                     imageUrl = data.image.original;
                 }
 
-                // Create HTML card
+                // CORREÇÃO: Usar data.id em vez de item.id
                 let card = document.createElement('a');
-                card.href = 'details.html?id=' + item.id;
+                card.href = 'details.html?id=' + data.id; 
                 card.className = 'card';
-                card.style.animationDelay = (i * 0.05) + "s"; // Stagger animation
+                card.style.animationDelay = (i * 0.05) + "s"; 
 
                 card.innerHTML = `
                     <img src="${imageUrl}" alt="Poster">
@@ -97,7 +91,6 @@ document.addEventListener('DOMContentLoaded', function() {
     async function searchShow() {
         let searchTerm = searchInput.value;
 
-        // Stop if search is empty
         if (searchTerm === "") {
             return;
         }
@@ -105,11 +98,9 @@ document.addEventListener('DOMContentLoaded', function() {
         sectionTitle.textContent = 'Results for "' + searchTerm + '"';
         resultsContainer.innerHTML = "<p>Searching database...</p>";
 
-        // Ask TVMaze API for search results
         let searchResponse = await fetch('https://api.tvmaze.com/search/shows?q=' + searchTerm);
         let searchData = await searchResponse.json();
 
-        // If no shows are found
         if (searchData.length === 0) {
             resultsContainer.innerHTML = "<p>No TV show found.</p>";
             return;
@@ -117,21 +108,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
         resultsContainer.innerHTML = "";
 
-        // Limit results to a maximum of 12
         let limit = 12;
         if (searchData.length < 12) {
             limit = searchData.length;
         }
 
-        // Loop to create search cards
         for (let i = 0; i < limit; i++) {
             let item = searchData[i].show;
 
-            // Search endpoint does not have episodes, so we fetch them separately
             let episodeCount = 0;
             let episodeResponse = await fetch('https://api.tvmaze.com/shows/' + item.id + '/episodes');
             
-            // Aqui também usamos o .ok para garantir que os episódios carregaram bem
             if (episodeResponse.ok === true) {
                 let episodes = await episodeResponse.json();
                 episodeCount = episodes.length;
@@ -150,7 +137,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 imageUrl = item.image.original;
             }
 
-            // Create HTML card
+            // AQUI MANTÉM-SE O item.id porque a variável chama-se item nesta função
             let card = document.createElement('a');
             card.href = 'details.html?id=' + item.id;
             card.className = 'card';
