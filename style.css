@@ -1,0 +1,143 @@
+/* Variáveis CSS para um tema minimalista claro */
+:root {
+    --bg-color: #fcfcfc;
+    --text-primary: #1a1a1a;
+    --text-secondary: #666666;
+    --accent-color: #000000;
+    --border-color: #e5e5e5;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-primary);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 2rem;
+}
+
+.container {
+    width: 100%;
+    max-width: 800px;
+    margin-top: 4rem;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+h1 {
+    font-weight: 600;
+    font-size: 2.5rem;
+    letter-spacing: -1px;
+    margin-bottom: 0.5rem;
+}
+
+header p {
+    color: var(--text-secondary);
+    font-weight: 300;
+}
+
+/* Interação de Pesquisa */
+.search-section {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 3rem;
+}
+
+input {
+    flex: 1;
+    padding: 1rem 1.5rem;
+    font-size: 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background: transparent;
+    outline: none;
+    transition: border-color 0.3s ease;
+}
+
+input:focus {
+    border-color: var(--accent-color);
+}
+
+button {
+    padding: 0 2rem;
+    background-color: var(--accent-color);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+button:hover {
+    transform: translateY(-2px);
+    opacity: 0.9;
+}
+
+/* Grid de Resultados */
+.results-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 2rem;
+}
+
+/* Estilo do Cartão (gerado por JS) e Animação CSS Exigida */
+.card {
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.5rem;
+    text-align: left;
+    background: white;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+    /* A animação CSS exigida nos requisitos */
+    animation: fadeIn 0.6s ease-out forwards;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.card:hover {
+    box-shadow: 0 10px 15px rgba(0,0,0,0.05);
+    transform: translateY(-4px);
+}
+
+.card img {
+    width: 100%;
+    height: 350px;
+    object-fit: cover;
+    border-radius: 6px;
+    margin-bottom: 1rem;
+}
+
+.card h2 {
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+}
+
+.card p {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+.highlight {
+    font-weight: 600;
+    color: var(--accent-color);
+}
+
+@keyframes fadeIn {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

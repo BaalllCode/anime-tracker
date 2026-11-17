@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anime Marathon Tracker</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Fonte minimalista do Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <main class="container">
+        <header>
+            <h1>Marathon Tracker</h1>
+            <p>Search an anime to calculate the total watch time.</p>
+        </header>
+
+        <section class="search-section">
+            <input type="text" id="searchInput" placeholder="e.g., Mob Psycho 100" autocomplete="off">
+            <button id="searchBtn">Calculate</button>
+        </section>
+
+        <!-- Esta div vai receber os resultados via JavaScript -->
+        <section id="resultsContainer" class="results-grid"></section>
+    </main>
+    
+    <script src="script.js"></script>
+</body>
+</html>
