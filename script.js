@@ -3,7 +3,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const searchInput = document.getElementById('searchInput');
     const resultsContainer = document.getElementById('resultsContainer');
 
-    // Permitir pesquisa ao carregar no "Enter" além do clique no botão
     searchInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') {
             performSearch();
@@ -16,45 +15,63 @@ document.addEventListener('DOMContentLoaded', () => {
         const query = searchInput.value.trim();
         if (!query) return;
 
-        // Limpar resultados anteriores e mostrar estado de carregamento
         resultsContainer.innerHTML = '<p style="grid-column: 1/-1; text-align: center;">Searching database...</p>';
 
         try {
-            // Fetch à API Jikan (MyAnimeList)
-            const response = await fetch(`https://api.jikan.moe/v4/anime?q=${encodeURIComponent(query)}&limit=6`);
+            // 1. Pesquisa base na TVMaze
+            const searchResponse = await fetch(`https://api.tvmaze.com/search/shows?q=${encodeURIComponent(query)}`);
+            if (!searchResponse.ok) throw new Error('Failed to fetch data');
             
-            if (!response.ok) throw new Error('Failed to fetch data');
-            
-            const result = await response.json();
-            const animes = result.data;
+            const searchData = await searchResponse.json();
 
-            resultsContainer.innerHTML = ''; // Limpar o texto de loading
-
-            if (animes.length === 0) {
+            if (searchData.length === 0) {
                 resultsContainer.innerHTML = '<p style="grid-column: 1/-1; text-align: center;">No anime found.</p>';
                 return;
             }
 
-            // Gerar os cartões para os resultados encontrados
-            animes.forEach((anime, index) => {
-                const episodes = anime.episodes || 0;
-                // Assumir 24 minutos por episódio se a duração for desconhecida
-                const durationMinutes = anime.duration && anime.duration.includes('min') 
-                    ? parseInt(anime.duration) 
-                    : 24; 
-                
-                const totalHours = ((episodes * durationMinutes) / 60).toFixed(1);
+            // Ficar apenas com os 6 melhores resultados para preencher a grelha de forma equilibrada
+            const topResults = searchData.slice(0, 6);
 
+            // 2. Fetch paralelo (Promise.all) para ir buscar os episódios de cada série simultaneamente
+            const marathonList = await Promise.all(topResults.map(async (item) => {
+                const show = item.show;
+                let episodesCount = 0;
+                
+                try {
+                    const epsResponse = await fetch(`https://api.tvmaze.com/shows/${show.id}/episodes`);
+                    if (epsResponse.ok) {
+                        const epsData = await epsResponse.json();
+                        episodesCount = epsData.length;
+                    }
+                } catch (e) {
+                    console.error("Error fetching episodes", e);
+                }
+
+                const runtime = show.averageRuntime || 24; 
+                const totalHours = ((episodesCount * runtime) / 60).toFixed(1);
+
+                return {
+                    title: show.name,
+                    image: show.image ? show.image.original : 'https://via.placeholder.com/250x350?text=No+Image',
+                    episodes: episodesCount,
+                    totalHours: totalHours,
+                    status: show.status
+                };
+            }));
+
+            resultsContainer.innerHTML = ''; 
+
+            // 3. Renderizar os cartões com os dados finais
+            marathonList.forEach((anime, index) => {
                 const card = document.createElement('div');
                 card.className = 'card';
-                // Adicionar um pequeno atraso (delay) na animação CSS para cada cartão aparecer em sequência
                 card.style.animationDelay = `${index * 0.1}s`;
 
                 card.innerHTML = `
-                    <img src="${anime.images.webp.large_image_url}" alt="${anime.title}">
-                    <h2>${anime.title_english || anime.title}</h2>
-                    <p>Episodes: <span class="highlight">${episodes > 0 ? episodes : 'Ongoing'}</span></p>
-                    <p>Total Time: <span class="highlight">${episodes > 0 ? totalHours + 'h' : '?'}</span></p>
+                    <img src="${anime.image}" alt="${anime.title}">
+                    <h2>${anime.title}</h2>
+                    <p>Episodes: <span class="highlight">${anime.episodes > 0 ? anime.episodes : 'N/A'}</span></p>
+                    <p>Total Time: <span class="highlight">${anime.episodes > 0 ? anime.totalHours + 'h' : '?'}</span></p>
                     <p>Status: <span>${anime.status}</span></p>
                 `;
 
