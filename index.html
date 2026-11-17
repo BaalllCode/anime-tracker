@@ -3,25 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Anime Marathon Tracker</title>
+    <title>TV Show Marathon Tracker</title>
     <link rel="stylesheet" href="style.css">
-    <!-- Fonte minimalista do Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
 </head>
 <body>
     <main class="container">
+        
+        <!-- Header -->
         <header>
             <h1>Marathon Tracker</h1>
-            <p>Search an anime to calculate the total watch time.</p>
+            <p>Search for a TV show to calculate the total marathon time.</p>
         </header>
 
+        <!-- Search Area -->
         <section class="search-section">
-            <input type="text" id="searchInput" placeholder="e.g., Mob Psycho 100" autocomplete="off">
-            <button id="searchBtn">Calculate</button>
+            <input type="text" id="searchInput" placeholder="e.g., Breaking Bad..." autocomplete="off">
+            <button id="searchBtn">Search</button>
         </section>
 
-        <!-- Esta div vai receber os resultados via JavaScript -->
-        <section id="resultsContainer" class="results-grid"></section>
+        <!-- Dynamic Title -->
+        <h2 id="sectionTitle" class="section-title">Recommended for you</h2>
+
+        <!-- Results Grid -->
+        <section id="resultsContainer" class="results-grid">
+            <!-- JavaScript will inject cards here -->
+        </section>
+
     </main>
     
     <script src="script.js"></script>

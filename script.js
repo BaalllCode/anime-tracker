@@ -1,86 +1,164 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const searchBtn = document.getElementById('searchBtn');
-    const searchInput = document.getElementById('searchInput');
-    const resultsContainer = document.getElementById('resultsContainer');
+// Wait for HTML to load
+document.addEventListener('DOMContentLoaded', function() {
+    
+    // 1. Store HTML elements in simple variables
+    let searchBtn = document.getElementById('searchBtn');
+    let searchInput = document.getElementById('searchInput');
+    let resultsContainer = document.getElementById('resultsContainer');
+    let sectionTitle = document.getElementById('sectionTitle');
 
-    searchInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-            performSearch();
+    // 12 IDs of popular TV Shows (Game of Thrones, Breaking Bad, Stranger Things, etc.)
+    let recommendedIds = [82, 169, 2993, 526, 431, 15299, 269, 430, 335, 527, 179, 30600];
+
+    // 2. Load recommendations when page opens
+    loadRecommendations();
+
+    // 3. Search button click event
+    searchBtn.addEventListener('click', function() {
+        searchShow();
+    });
+
+    // 4. Enter key event on the input box
+    searchInput.addEventListener('keypress', function(event) {
+        if (event.key === 'Enter') {
+            searchShow();
         }
     });
 
-    searchBtn.addEventListener('click', performSearch);
+    // --- FUNCTION A: LOAD INITIAL RECOMMENDATIONS ---
+    async function loadRecommendations() {
+        sectionTitle.textContent = "Recommended for you";
+        resultsContainer.innerHTML = "<p>Loading 12 recommendations...</p>";
 
-    async function performSearch() {
-        const query = searchInput.value.trim();
-        if (!query) return;
+        // Create an array of fetch requests
+        let requestList = [];
+        for (let i = 0; i < recommendedIds.length; i++) {
+            let id = recommendedIds[i];
+            let request = fetch('https://api.tvmaze.com/shows/' + id + '?embed=episodes');
+            requestList.push(request);
+        }
 
-        resultsContainer.innerHTML = '<p style="grid-column: 1/-1; text-align: center;">Searching database...</p>';
+        // Wait for all requests to finish at the same time
+        let responses = await Promise.all(requestList);
+        
+        resultsContainer.innerHTML = ""; // Clear loading message
 
-        try {
-            // 1. Pesquisa base na TVMaze
-            const searchResponse = await fetch(`https://api.tvmaze.com/search/shows?q=${encodeURIComponent(query)}`);
-            if (!searchResponse.ok) throw new Error('Failed to fetch data');
-            
-            const searchData = await searchResponse.json();
+        // Read data and create cards using a simple FOR loop
+        for (let i = 0; i < responses.length; i++) {
+            let response = responses[i];
+            let data = await response.json();
 
-            if (searchData.length === 0) {
-                resultsContainer.innerHTML = '<p style="grid-column: 1/-1; text-align: center;">No anime found.</p>';
-                return;
+            // Find episode count
+            let episodeCount = 0;
+            if (data._embedded && data._embedded.episodes) {
+                episodeCount = data._embedded.episodes.length;
             }
 
-            // Ficar apenas com os 6 melhores resultados para preencher a grelha de forma equilibrada
-            const topResults = searchData.slice(0, 6);
+            // Find duration
+            let duration = data.averageRuntime;
+            if (duration === null) {
+                duration = 45; // Default for normal TV shows
+            }
 
-            // 2. Fetch paralelo (Promise.all) para ir buscar os episódios de cada série simultaneamente
-            const marathonList = await Promise.all(topResults.map(async (item) => {
-                const show = item.show;
-                let episodesCount = 0;
-                
-                try {
-                    const epsResponse = await fetch(`https://api.tvmaze.com/shows/${show.id}/episodes`);
-                    if (epsResponse.ok) {
-                        const epsData = await epsResponse.json();
-                        episodesCount = epsData.length;
-                    }
-                } catch (e) {
-                    console.error("Error fetching episodes", e);
-                }
+            // Math for total hours
+            let totalMinutes = episodeCount * duration;
+            let totalHours = (totalMinutes / 60).toFixed(1);
 
-                const runtime = show.averageRuntime || 24; 
-                const totalHours = ((episodesCount * runtime) / 60).toFixed(1);
+            // Find image
+            let imageUrl = "https://via.placeholder.com/250x350?text=No+Image";
+            if (data.image && data.image.original) {
+                imageUrl = data.image.original;
+            }
 
-                return {
-                    title: show.name,
-                    image: show.image ? show.image.original : 'https://via.placeholder.com/250x350?text=No+Image',
-                    episodes: episodesCount,
-                    totalHours: totalHours,
-                    status: show.status
-                };
-            }));
+            // Create HTML card
+            let card = document.createElement('div');
+            card.className = 'card';
+            card.style.animationDelay = (i * 0.05) + "s"; // Stagger animation
 
-            resultsContainer.innerHTML = ''; 
+            card.innerHTML = `
+                <img src="${imageUrl}" alt="Poster">
+                <h2>${data.name}</h2>
+                <p>Episodes: <span class="highlight">${episodeCount}</span></p>
+                <p>Time: <span class="highlight">${totalHours}h</span></p>
+                <p>Status: <span>${data.status}</span></p>
+            `;
 
-            // 3. Renderizar os cartões com os dados finais
-            marathonList.forEach((anime, index) => {
-                const card = document.createElement('div');
-                card.className = 'card';
-                card.style.animationDelay = `${index * 0.1}s`;
-
-                card.innerHTML = `
-                    <img src="${anime.image}" alt="${anime.title}">
-                    <h2>${anime.title}</h2>
-                    <p>Episodes: <span class="highlight">${anime.episodes > 0 ? anime.episodes : 'N/A'}</span></p>
-                    <p>Total Time: <span class="highlight">${anime.episodes > 0 ? anime.totalHours + 'h' : '?'}</span></p>
-                    <p>Status: <span>${anime.status}</span></p>
-                `;
-
-                resultsContainer.appendChild(card);
-            });
-
-        } catch (error) {
-            resultsContainer.innerHTML = `<p style="grid-column: 1/-1; text-align: center; color: red;">Error connecting to the database.</p>`;
-            console.error(error);
+            resultsContainer.appendChild(card);
         }
     }
+
+
+    // --- FUNCTION B: SEARCH FOR A SPECIFIC TV SHOW ---
+    async function searchShow() {
+        let searchTerm = searchInput.value;
+
+        // Stop if search is empty
+        if (searchTerm === "") {
+            return;
+        }
+
+        sectionTitle.textContent = 'Results for "' + searchTerm + '"';
+        resultsContainer.innerHTML = "<p>Searching database...</p>";
+
+        // Ask TVMaze API for search results
+        let searchResponse = await fetch('https://api.tvmaze.com/search/shows?q=' + searchTerm);
+        let searchData = await searchResponse.json();
+
+        // If no shows are found
+        if (searchData.length === 0) {
+            resultsContainer.innerHTML = "<p>No TV show found.</p>";
+            return;
+        }
+
+        resultsContainer.innerHTML = "";
+
+        // Limit results to a maximum of 12
+        let limit = 12;
+        if (searchData.length < 12) {
+            limit = searchData.length;
+        }
+
+        // Loop to create search cards
+        for (let i = 0; i < limit; i++) {
+            let item = searchData[i].show;
+
+            // Search endpoint does not have episodes, so we fetch them separately
+            let episodeCount = 0;
+            let episodeResponse = await fetch('https://api.tvmaze.com/shows/' + item.id + '/episodes');
+            
+            if (episodeResponse.ok) {
+                let episodes = await episodeResponse.json();
+                episodeCount = episodes.length;
+            }
+
+            let duration = item.averageRuntime;
+            if (duration === null) {
+                duration = 45;
+            }
+
+            let totalMinutes = episodeCount * duration;
+            let totalHours = (totalMinutes / 60).toFixed(1);
+
+            let imageUrl = "https://via.placeholder.com/250x350?text=No+Image";
+            if (item.image && item.image.original) {
+                imageUrl = item.image.original;
+            }
+
+            // Create HTML card
+            let card = document.createElement('div');
+            card.className = 'card';
+            card.style.animationDelay = (i * 0.05) + "s";
+
+            card.innerHTML = `
+                <img src="${imageUrl}" alt="Poster">
+                <h2>${item.name}</h2>
+                <p>Episodes: <span class="highlight">${episodeCount}</span></p>
+                <p>Time: <span class="highlight">${totalHours}h</span></p>
+                <p>Status: <span>${item.status}</span></p>
+            `;
+
+            resultsContainer.appendChild(card);
+        }
+    }
+
 });
